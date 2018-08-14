@@ -16,7 +16,24 @@ function findDup(arr) {
 function fileNameFromPathName(arr){
 	return arr.map( i => i.split('/').pop())
 }
+function me({
+	let string = `
+	    <div class="camera"></div>
+	    <div class="cinema alibaba"></div>
+	`
 
+	let pattern = /.+?class="(.+?)".+?/g
+
+	var match = pattern.exec(string);
+	var arr = []
+
+	while (match != null) {
+	  match[1].split(" ").forEach(x => arr.push(x));
+	  match = pattern.exec(string)
+	}
+
+	console.log(arr);
+}
 module.exports = {
 	get : (dir, excluded='') => {
 
