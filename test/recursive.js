@@ -9,7 +9,9 @@ import {expect, assert} from 'chai'
 
 describe('testing directory scan package', function () {
 	it('should read file', () => {
-		dirScan.get('./project/')
+		let a = dirScan.get('./project/')
+
+		console.log(a)
 
 
 	})

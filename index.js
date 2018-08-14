@@ -58,23 +58,23 @@ function readFiles(dirname, onFileContent, onError) {
 }
 module.exports = {
 	get : (dir) => {
-		console.log(dir)
-		fs.readdirSync(dir, function(err, filenames) {
-			console.log(filenames)
-			if (err) {
-				onError(err);
-				return;
-			}
-			filenames.forEach(function(filename) {
-				fs.readFile(dir + filename, 'utf-8', function(err, content) {
-					if (err) {
-						onError(err);
-						return;
-					}
-					console.log(filename);
-				});
-			});
-		});
+		let text = ''
+		fs.readdirSync(dir).map( i => {
+								console.log(dir+i)
+								fs.readFileSync(dir+i, 'utf-8', (err, content) => {
+									console.log(content)
+									text = text + content
+								})
+							})
+
+		// fs.readdirSync(dir, function(err, filenames) {
+		// 	filenames.map( filename => {
+		// 		fs.readFileSync(dir + filename, 'utf-8', (err, content) => {
+		// 			text = text + content
+		// 		})
+		// 	})
+		// })
+		return text
 		
 	}
 }
