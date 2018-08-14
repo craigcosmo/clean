@@ -5,6 +5,8 @@ import dirScan from '../index.js'
 import {expect, assert} from 'chai'
 
 
+
+
 describe('testing directory scan package', function () {
 	it('should return a list of directories', () => {
 		let array = dirScan.get('./')

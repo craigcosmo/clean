@@ -16,7 +16,7 @@ function findDup(arr) {
 function fileNameFromPathName(arr){
 	return arr.map( i => i.split('/').pop())
 }
-function me({
+function me(){
 	let string = `
 	    <div class="camera"></div>
 	    <div class="cinema alibaba"></div>
