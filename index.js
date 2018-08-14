@@ -16,57 +16,66 @@ function findDup(arr) {
 function fileNameFromPathName(arr){
 	return arr.map( i => i.split('/').pop())
 }
-function me(){
-	let string = `
-	    <div class="camera"></div>
-	    <div class="cinema alibaba"></div>
-	`
-
+function getClassInTag(string){
+	
 	let pattern = /.+?class="(.+?)".+?/g
 
-	var match = pattern.exec(string);
-	var arr = []
+	let match = pattern.exec(string);
+	let arr = []
 
 	while (match != null) {
-	  match[1].split(" ").forEach(x => arr.push(x));
+	  match[1].split(" ").forEach(x => arr.push(x.trim()));
 	  match = pattern.exec(string)
 	}
 
 	console.log(arr);
 }
-module.exports = {
-	get : (dir, excluded='') => {
+function getAllClassNameFromFile(string){
+	let pattern = /(?:[\.]{1})([a-zA-Z_]+[\w-_]*)(?:[\s\.\{\>#\:]{1})/igm
 
-		excluded = excluded.constructor === Array ? excluded.join('|') : excluded
+	let match = string.match(pattern);
 
-		let regex = new RegExp( excluded )
-		let directories = []
-		let pathNames =[]
+	let d = match.map( (i) => i.replace(/{|}/g,'').trim())
+	console.log(d);
+}
 
-		fs.readdirSync(dir)
-			.filter( i => fs.statSync(dir+i).isDirectory() )
-			.filter( i => !/^\.|node_modules/.test(i) ) // exclude .git and node_modules
-			.filter( i => {
-				if (excluded.length) {
-					return !regex.test(i)
-				}else{
-					return true
+function readFiles(dirname, onFileContent, onError) {
+	fs.readdirSync(dirname, function(err, filenames) {
+		if (err) {
+			onError(err);
+			return;
+		}
+		filenames.forEach(function(filename) {
+			fs.readFile(dirname + filename, 'utf-8', function(err, content) {
+				if (err) {
+					onError(err);
+					return;
 				}
-			})
-			.map(i => { 
-				let a = glob.sync(i+'/**/')
-				// console.log('a',a)
-				directories.push(...a)
-
-				let d = glob.sync(i+'/**/*.*')
-				pathNames.push(...d)
-			})
-
-		let duplicated = findDup(fileNameFromPathName(pathNames))
-
-		// console.log('d',duplicated)
-		duplicated.length && console.log('Found duplicated file names: \n\n' +'['+ duplicated+']'+'\n' )
-		return directories
+				onFileContent(filename, content);
+			});
+		});
+	});
+}
+module.exports = {
+	get : (dir) => {
+		console.log(dir)
+		fs.readdirSync(dir, function(err, filenames) {
+			console.log(filenames)
+			if (err) {
+				onError(err);
+				return;
+			}
+			filenames.forEach(function(filename) {
+				fs.readFile(dir + filename, 'utf-8', function(err, content) {
+					if (err) {
+						onError(err);
+						return;
+					}
+					console.log(filename);
+				});
+			});
+		});
+		
 	}
 }
 
