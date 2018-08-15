@@ -36,29 +36,47 @@ function getAllClassNameFromFile(string){
 	let match = string.match(pattern);
 
 	let d = match.map( (i) => i.replace(/{|}/g,'').trim())
-
-	// remove duplicate
-
-	let unique = [...new Set(d)]
-
-	// remove word start and end with dot
-	let g = unique.filter((i) => i.match(/^\.*\.$/g))
-	return g
-	// console.log(d);
+	console.log(d);
 }
 
-
+function readFiles(dirname, onFileContent, onError) {
+	fs.readdirSync(dirname, function(err, filenames) {
+		if (err) {
+			onError(err);
+			return;
+		}
+		filenames.forEach(function(filename) {
+			fs.readFile(dirname + filename, 'utf-8', function(err, content) {
+				if (err) {
+					onError(err);
+					return;
+				}
+				onFileContent(filename, content);
+			});
+		});
+	});
+}
 module.exports = {
 	get : (dir) => {
 		let text = ''
 		fs.readdirSync(dir).map( i => {
-								let b = fs.readFileSync(dir+i, 'utf8')
-								text = text + b 
+								console.log(dir+i)
+								fs.readFileSync(dir+i, 'utf-8', (err, content) => {
+									console.log(content)
+									text = text + content
+								})
 							})
 
-
-		return getAllClassNameFromFile(text)
+		// fs.readdirSync(dir, function(err, filenames) {
+		// 	filenames.map( filename => {
+		// 		fs.readFileSync(dir + filename, 'utf-8', (err, content) => {
+		// 			text = text + content
+		// 		})
+		// 	})
+		// })
+		return text
 		
 	}
 }
+
 
