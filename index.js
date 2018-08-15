@@ -42,7 +42,7 @@ function getAllClassNameFromFile(string){
 	let unique = [...new Set(d)]
 
 	// remove word start and end with dot
-	let g = unique.filter((i) => i.match(/^\.*\.$/g))
+	let g = unique.filter((i) => !i.match(/^\..+\.$/g))
 	return g
 	// console.log(d);
 }
