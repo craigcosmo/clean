@@ -1,7 +1,7 @@
 {
-  "name": "directory-scan",
+  "name": "css-clean-site-wide",
   "version": "1.0.7",
-  "description": "return an array which contains all folders and subfolers of a provided directory ",
+  "description": "find duplicate css in project ",
   "main": "./dist/index.js",
   "scripts": {
     "test": "mocha --watch --compilers js:babel-register",
