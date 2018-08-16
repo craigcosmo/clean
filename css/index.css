@@ -5025,6 +5025,7 @@ img.introlg {
 	line-height: 16px;
 }
 .miss div {
+	flex: 1;
 	border-bottom: 1px solid #B8B3B1;
 }
 .massi {

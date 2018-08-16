@@ -7,13 +7,18 @@ import {expect, assert} from 'chai'
 
 
 
-describe('testing directory scan package', function () {
-	it('should read file', () => {
-		let a = dirScan.get('./project/')
-
+describe('scan result', function () {
+	// it('show class from css files', () => {
+	// 	let a = dirScan.scanCss('./css/')
+	// 	// console.log(a)
+	// })
+	// it('show class from view files', () => {
+	// 	let a = dirScan.scanCode('./project/')
+	// 	// console.log(a)
+	// })
+	it('find dup css', () => {
+		let a = dirScan.findDuplicate('./project/', './css/')
 		console.log(a)
-
-
 	})
 	
 })
