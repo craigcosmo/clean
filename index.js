@@ -1,6 +1,6 @@
 import fs from 'fs'
 import glob from 'glob'
-import recursive from 'recursive-readdir'
+
 
 function findDup(arr) {
 
