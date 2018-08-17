@@ -1,6 +1,6 @@
 {
   "name": "css-clean-site-wide",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "find duplicate css in project ",
   "main": "./dist/index.js",
   "scripts": {
