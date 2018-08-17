@@ -8,6 +8,10 @@ var _glob = require('glob');
 
 var _glob2 = _interopRequireDefault(_glob);
 
+var _recursiveReaddir = require('recursive-readdir');
+
+var _recursiveReaddir2 = _interopRequireDefault(_recursiveReaddir);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
@@ -24,47 +28,100 @@ function findDup(arr) {
 	}
 	return duplicates;
 }
-function fileNameFromPathName(arr) {
-	return arr.map(function (i) {
-		return i.split('/').pop();
+
+function getClassFromSouce(string) {
+
+	var pattern = /.+?class="(.+?)".+?/g;
+
+	var match = pattern.exec(string);
+	var arr = [];
+
+	while (match != null) {
+		match[1].split(" ").forEach(function (x) {
+			return arr.push(x.trim());
+		});
+		match = pattern.exec(string);
+	}
+	// remove duplicate
+	var unique = [].concat(_toConsumableArray(new Set(arr)));
+
+	// console.log(arr);
+	return unique;
+}
+function getAllClassNameCssFile(string) {
+	var pattern = /(?:[\.]{1})([a-zA-Z_]+[\w-_]*)(?:[\s\.\{\>#\:]{1})/igm;
+
+	var match = string.match(pattern);
+
+	var d = match.map(function (i) {
+		return i.replace(/{|}/g, '').trim();
 	});
+
+	// remove duplicate
+	var unique = [].concat(_toConsumableArray(new Set(d)));
+	// remove word start and end with dot
+	var g = unique.filter(function (i) {
+		return !i.match(/^\..+\.$/g);
+	});
+	// remove pseudo colon
+	var f = g.map(function (i) {
+		return i.replace(/\:$/ig, '');
+	});
+	// remove dot prefix
+	var t = f.map(function (i) {
+		return i.replace(/^\./ig, '');
+	});
+	return t;
+	// console.log(d);
+}
+function getDiff(a1, a2) {
+
+	var a = [],
+	    diff = [];
+
+	for (var i = 0; i < a1.length; i++) {
+		a[a1[i]] = true;
+	}
+
+	for (var i = 0; i < a2.length; i++) {
+		if (a[a2[i]]) {
+			delete a[a2[i]];
+		} else {
+			a[a2[i]] = true;
+		}
+	}
+
+	for (var k in a) {
+		diff.push(k);
+	}
+
+	return diff;
 }
 
 module.exports = {
-	get: function get(dir) {
-		var excluded = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
-
-
-		excluded = excluded.constructor === Array ? excluded.join('|') : excluded;
-
-		var regex = new RegExp(excluded);
-		var directories = [];
-		var pathNames = [];
-
-		_fs2.default.readdirSync(dir).filter(function (i) {
-			return _fs2.default.statSync(dir + i).isDirectory();
-		}).filter(function (i) {
-			return !/^\.|node_modules/.test(i);
-		}) // exclude .git and node_modules
-		.filter(function (i) {
-			if (excluded.length) {
-				return !regex.test(i);
-			} else {
-				return true;
-			}
-		}).map(function (i) {
-			var a = _glob2.default.sync(i + '/**/');
-			// console.log('a',a)
-			directories.push.apply(directories, _toConsumableArray(a));
-
-			var d = _glob2.default.sync(i + '/**/*.*');
-			pathNames.push.apply(pathNames, _toConsumableArray(d));
+	scan: function scan(dir) {
+		var a = _glob2.default.sync(dir + '**');
+		// get files only
+		var b = a.filter(function (i) {
+			return !_fs2.default.statSync(i).isDirectory();
 		});
 
-		var duplicated = findDup(fileNameFromPathName(pathNames));
+		var text = '';
+		b.map(function (i) {
+			var u = _fs2.default.readFileSync(i, 'utf8');
+			text = text + u;
+		});
+		return text;
+	},
+	findDuplicate: function findDuplicate(sourceCode, cssFile) {
 
-		// console.log('d',duplicated)
-		duplicated.length && console.log('Found duplicated file names: \n\n' + '[' + duplicated + ']' + '\n');
-		return directories;
+		var css = getAllClassNameCssFile(this.scan(cssFile));
+
+		var source = getClassFromSouce(this.scan(sourceCode));
+
+		var d = getDiff(css, source);
+
+		return d;
 	}
+
 };

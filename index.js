@@ -1,6 +1,6 @@
 import fs from 'fs'
 import glob from 'glob'
-
+import recursive from 'recursive-readdir'
 
 function findDup(arr) {
 
@@ -13,10 +13,8 @@ function findDup(arr) {
 	}
 	return duplicates
 }
-function fileNameFromPathName(arr){
-	return arr.map( i => i.split('/').pop())
-}
-function getClassFromTag(string){
+
+function getClassFromSouce(string){
 	
 	let pattern = /.+?class="(.+?)".+?/g
 
@@ -33,7 +31,7 @@ function getClassFromTag(string){
 	// console.log(arr);
 	return unique
 }
-function getAllClassNameFromFile(string){
+function getAllClassNameCssFile(string){
 	let pattern = /(?:[\.]{1})([a-zA-Z_]+[\w-_]*)(?:[\s\.\{\>#\:]{1})/igm
 
 	let match = string.match(pattern);
@@ -51,7 +49,7 @@ function getAllClassNameFromFile(string){
 	return t
 	// console.log(d);
 }
-function arr_diff (a1, a2) {
+function getDiff (a1, a2) {
 
     var a = [], diff = [];
 
@@ -75,30 +73,26 @@ function arr_diff (a1, a2) {
 }
 
 module.exports = {
-	scanCss : function(dir)  {
+	scan : function(dir) {
+		let a = glob.sync(dir+'**')
+		// get files only
+		let b = a.filter( i => !fs.statSync(i).isDirectory())
+
 		let text = ''
-		fs.readdirSync(dir).map( i => {
-								let b = fs.readFileSync(dir+i, 'utf8')
-								text = text + b 
-							})
-		return getAllClassNameFromFile(text)
-	},
-	scanCode : function(dir) {
-		let text = ''
-		fs.readdirSync(dir).map( i => {
-								let b = fs.readFileSync(dir+i, 'utf8')
-								text = text + b 
-							})
-		return getClassFromTag(text)
+		b.map( i => {
+				let u = fs.readFileSync(i, 'utf8')
+				text = text + u
+			})
+		return text
 	},
 	findDuplicate : function(sourceCode, cssFile) {
 
-		let css = this.scanCss(cssFile)
+		let css = getAllClassNameCssFile(this.scan(cssFile))
 
-		let source = this.scanCode(sourceCode)
+		let source = getClassFromSouce(this.scan(sourceCode))
 
 
-		let d = arr_diff(css, source)
+		let d = getDiff(css, source)
 
 		return d
 	}
